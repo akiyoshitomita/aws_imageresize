@@ -8,6 +8,7 @@
 
 TmpDir=tmp
 SrcDir=src
+PipLibFile=piplib.zip
 OutFile=function.zip
 RequirementFile=requirements.txt
 
@@ -15,18 +16,24 @@ RequirementFile=requirements.txt
 #    メイン処理 
 # =================================================================
 
-# ワークディレクトリの初期化
-if [ -d ${TmpDir} ] 
+# pip3のライブラリファイルを作成
+#  * 存在する場合は再作成しない
+if [ ! -f ${PipLibFile} ] 
 then
-  rm -rf ${TmpDir} 
+  # ワークディレクトリの初期化
+  if [ -d ${TmpDir} ] 
+    then
+    rm -rf ${TmpDir} 
+  fi
+  mkdir ${TmpDir}
+
+  pip3 install -r ${RequirementFile} -t ${TmpDir}
+  cd ${TmpDir}
+  zip -r9 ../${PipLibFile} ./
+  cd .. 
 fi
-# ワークディレクトリの作成
-mkdir ${TmpDir}
-cp -r ${SrcDir}/* ${TmpDir}/ 
 
-# pip3からライブラリのインストール
-pip3 install -r ${RequirementFile} -t ${TmpDir}
-
-cd ${TmpDir}
-zip -r9 ../${OutFile} ./
+cp -f ${PipLibFile} ${OutFile}
+cd ${SrcDir}
+  zip -g -r ../${OutFile} ./
 cd ..
